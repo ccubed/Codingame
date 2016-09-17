@@ -1,2 +1,2 @@
 # Codingame
-Solutions and AI Bots
+Solutions and AI Bots for Codingame
