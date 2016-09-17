@@ -6,7 +6,6 @@ thereby enabling me to survey the maps entire surface area.
 
 """
 import math
-import sys
 
 busters_per_player = int(input())  # the amount of busters you control
 ghost_count = int(input())  # the amount of ghosts on the map
@@ -38,7 +37,6 @@ def patrol(loc, i):
     :param i:  which buster
     :return: the move string
     """
-    print(idest, file=sys.stderr)
     if idest[i]['current'] is not None:
         if calc_distance(loc, FP[i][idest[i]['path_xy'][0]][idest[i]['path_xy'][1]]) > 0:
             return "MOVE {} {}".format(idest[i]['current'][0], idest[i]['current'][1])
@@ -82,7 +80,6 @@ while True:
             entity_data['ghosts'].append({'id': entity_id, 'location': (x, y), 'state': value})
     for i in sorted(entity_data['busters'].keys()):
         if entity_data['busters'][i]['ghost']:
-            print("DEBUG: Carry to base", file=sys.stderr)
             if entity_data['busters'][i]['value'] in captures:
                 del captures[entity_data['busters'][i]['value']]
             if calc_distance(entity_data['busters'][i]['location'], my_base_location) <= 1500:
@@ -90,49 +87,38 @@ while True:
             else:
                 print("MOVE {} {}".format(my_base_location[0], my_base_location[1]))
         elif len(entity_data['ghosts']) > 0 and entity_data['ghosts']:
-            print("DEBUG: GHOSTS for ID {}".format(i), file=sys.stderr)
             ghost_distances = {}
             captured_g = False
             existing_g = False
             for ghost in entity_data['ghosts']:
                 if ghost['id'] in captures:
                     if i in captures[ghost['id']]:
-                        print("DEBUG: EXISTING CAPTURE", file=sys.stderr)
                         print("BUST {}".format(ghost['id']))
                         existing_g = True
                         captured_g = True
                         break
                 if not existing_g:
-                    print("DEBUG: CALC DISTANCE", file=sys.stderr)
                     gdc = calc_distance(entity_data['busters'][i]['location'], ghost['location'])
                     if 900 <= gdc <= 1700:
-                        print("DEBUG: BUST A GHOSt", file=sys.stderr)
                         print("BUST {}".format(ghost['id']))
                         if ghost['id'] in captures:
-                            print("DEBUG: Add to captures existing", file=sys.stderr)
                             captures[ghost['id']].append(i)
                         else:
-                            print("DEBUG: Add to captures new", file=sys.stderr)
                             captures[ghost['id']] = [i]
                         captured_g = True
                         break
                     elif gdc <= 899:  # Too close, move away
-                        print("DEBUG: MOVE AWAY FROM GHOST", file=sys.stderr)
                         print("MOVE {} {}".format(entity_data['busters'][i]['location'][0] + 800,
                                                   entity_data['busters'][i]['location'][1] + 800))
                         captured_g = True
                         break
                     else:
-                        print("DEBUG: ADD TO SEEN GHOSTS", file=sys.stderr)
                         ghost_distances[gdc] = ghost['location']  # Add ghost to list of ghosts in sight
             if not captured_g:  # Move towards closest ghost
                 if len(ghost_distances):
-                    print("DEBUG: MOVE TOWARDS GHOST", file=sys.stderr)
                     print("MOVE {} {}".format(ghost_distances[min(ghost_distances.keys())][0],
-                                                ghost_distances[min(ghost_distances.keys())][1]))
+                                              ghost_distances[min(ghost_distances.keys())][1]))
                 else:
-                    print("DEBUG: PATROL IN GHOSTS", file=sys.stderr)
                     print(patrol(entity_data['busters'][i]['location'], i%busters_per_player))
         else:
-            print("DEBUG: Patrol", file=sys.stderr)
             print(patrol(entity_data['busters'][i]['location'], i%busters_per_player))
