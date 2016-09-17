@@ -41,12 +41,16 @@ def patrol(loc, i):
         if calc_distance(loc, FP[i][idest[i]['path_xy'][0]][idest[i]['path_xy'][1]]) > 0:
             return "MOVE {} {}".format(idest[i]['current'][0], idest[i]['current'][1])
         else:
-            new_x = idest[i]['path_xy'][0] + 1
-            if new_x >= cx:
-                new_x = 0
             new_y = idest[i]['path_xy'][1] + 1 if idest[i]['path_xy'][1] + 1 <= 3 else 0
-            idest[i]['current'] = FP[i][new_x][new_y]
-            idest[i]['path_xy'] = (new_x, new_y)
+            if new_y != 0:
+                idest[i]['current'] = FP[i][idest[i]['path_xy'][0]][new_y]
+                idest[i]['path_xy'] = (idest[i]['path_xy'][0], new_y)
+            else:
+                new_x = idest[i]['path_xy'][0] + 1
+                if new_x >= cx:
+                    new_x = 0
+                idest[i]['current'] = FP[i][new_x][new_y]
+                idest[i]['path_xy'] = (new_x, new_y)
             return "MOVE {} {}".format(idest[i]['current'][0], idest[i]['current'][1])
     else:
         idest[i]['path_xy'] = (0, 0)
